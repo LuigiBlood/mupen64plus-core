@@ -44,7 +44,7 @@ void init_cic_using_ipl3(struct cic* cic, const void* ipl3)
         { CIC_X103, 0x78 },
         { CIC_X105, 0x91 },
         { CIC_X106, 0x85 },
-		{ CIC_5167, 0xdd }
+        { CIC_5167, 0xdd }
     };
 
     for (i = 0; i < 0xfc0/4; i++)
