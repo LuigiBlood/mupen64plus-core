@@ -61,7 +61,7 @@ void init_cic_using_ipl3(struct cic* cic, const void* ipl3)
         case UINT64_C(0x000000D6497E414B): i = 2; break; /* CIC_X103 */
         case UINT64_C(0x0000011A49F60E96): i = 3; break; /* CIC_X105 */
         case UINT64_C(0x000000D6D5BE5580): i = 4; break; /* CIC_X106 */
-		case UINT64_C(0x000001053BC19870): i = 5; break; /* CIC_5167 */
+        case UINT64_C(0x000001053BC19870): i = 5; break; /* CIC_5167 */
     }
 
     memcpy(cic, &cics[i], sizeof(*cic));
