@@ -34,6 +34,7 @@
 #include "rsp/rsp_core.h"
 #include "si/si_controller.h"
 #include "vi/vi_controller.h"
+#include "dd/dd_controller.h"
 
 #ifdef DBG
 #include <string.h>
@@ -942,6 +943,7 @@ static void write_pifd(void)
 /* HACK: just to get F-Zero to boot
  * TODO: implement a real DD module
  */
+/*
 static int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
 {
     *value = (address == 0xa5000508)
@@ -955,45 +957,46 @@ static int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_
 {
     return 0;
 }
+*/
 
 static void read_dd(void)
 {
-    readw(read_dd_regs, NULL, address, rdword);
+	readw(read_dd_regs, &g_dd, address, rdword);
 }
 
 static void read_ddb(void)
 {
-    readb(read_dd_regs, NULL, address, rdword);
+	readb(read_dd_regs, &g_dd, address, rdword);
 }
 
 static void read_ddh(void)
 {
-    readh(read_dd_regs, NULL, address, rdword);
+	readh(read_dd_regs, &g_dd, address, rdword);
 }
 
 static void read_ddd(void)
 {
-    readd(read_dd_regs, NULL, address, rdword);
+	readd(read_dd_regs, &g_dd, address, rdword);
 }
 
 static void write_dd(void)
 {
-    writew(write_dd_regs, NULL, address, cpu_word);
+	writew(write_dd_regs, &g_dd, address, cpu_word);
 }
 
 static void write_ddb(void)
 {
-    writeb(write_dd_regs, NULL, address, cpu_byte);
+	writeb(write_dd_regs, &g_dd, address, cpu_byte);
 }
 
 static void write_ddh(void)
 {
-    writeh(write_dd_regs, NULL, address, cpu_hword);
+	writeh(write_dd_regs, &g_dd, address, cpu_hword);
 }
 
 static void write_ddd(void)
 {
-    writed(write_dd_regs, NULL, address, cpu_dword);
+	writed(write_dd_regs, &g_dd, address, cpu_dword);
 }
 
 #ifdef DBG
@@ -1284,9 +1287,9 @@ int init_memory(void)
         map_region(0xa000+i, M64P_MEM_NOTHING, RW(nothing));
     }
 
-    /* map DD regsiters */
-    map_region(0x8500, M64P_MEM_NOTHING, RW(dd));
-    map_region(0xa500, M64P_MEM_NOTHING, RW(dd));
+    /* map DD registers */
+    map_region(0x8500, M64P_MEM_DD, RW(dd));
+    map_region(0xa500, M64P_MEM_DD, RW(dd));
     for(i = 0x501; i < 0x800; ++i)
     {
         map_region(0x8000+i, M64P_MEM_NOTHING, RW(nothing));

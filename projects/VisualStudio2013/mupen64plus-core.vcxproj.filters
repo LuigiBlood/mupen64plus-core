@@ -64,6 +64,9 @@
     <Filter Include="r4300\new_dynarec\arm">
       <UniqueIdentifier>{873c3262-2472-407c-8451-67cbb5f78bae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dd">
+      <UniqueIdentifier>{90b2fb9a-45e4-42b9-a7c0-f5932c2cc875}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\ai\ai_controller.c">
@@ -402,6 +405,9 @@
     <ClCompile Include="..\..\src\debugger\dbg_memory.c">
       <Filter>debugger</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\dd\dd_controller.c">
+      <Filter>dd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ai\ai_controller.h">
@@ -724,6 +730,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\debugger\dbg_types.h">
       <Filter>debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dd\dd_controller.h">
+      <Filter>dd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -251,7 +251,8 @@ typedef enum {
   M64P_MEM_ROM,
   M64P_MEM_PIF,
   M64P_MEM_MI,
-  M64P_MEM_BREAKPOINT
+  M64P_MEM_BREAKPOINT,
+  M64P_MEM_DD
 } m64p_dbg_mem_type;
 
 typedef enum {

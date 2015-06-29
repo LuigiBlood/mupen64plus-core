@@ -74,6 +74,7 @@
 #include "sra_file.h"
 #include "util.h"
 #include "vi/vi_controller.h"
+#include "dd/dd_controller.h"
 
 #ifdef DBG
 #include "debugger/dbg_debugger.h"
@@ -101,6 +102,7 @@ struct pi_controller g_pi;
 struct ri_controller g_ri;
 struct si_controller g_si;
 struct vi_controller g_vi;
+struct dd_controller g_dd;
 struct r4300_core g_r4300;
 struct rdp_core g_dp;
 struct rsp_core g_sp;

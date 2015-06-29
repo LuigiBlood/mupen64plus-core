@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\api\debugger.c" />
     <ClCompile Include="..\..\src\api\frontend.c" />
     <ClCompile Include="..\..\src\api\vidext.c" />
+    <ClCompile Include="..\..\src\dd\dd_controller.c" />
     <ClCompile Include="..\..\src\debugger\dbg_breakpoints.c" />
     <ClCompile Include="..\..\src\debugger\dbg_debugger.c" />
     <ClCompile Include="..\..\src\debugger\dbg_decoder.c" />
@@ -297,6 +298,7 @@
     <ClInclude Include="..\..\src\api\m64p_vidext.h" />
     <ClInclude Include="..\..\src\api\vidext.h" />
     <ClInclude Include="..\..\src\api\vidext_sdl2_compat.h" />
+    <ClInclude Include="..\..\src\dd\dd_controller.h" />
     <ClInclude Include="..\..\src\debugger\dbg_breakpoints.h" />
     <ClInclude Include="..\..\src\debugger\dbg_debugger.h" />
     <ClInclude Include="..\..\src\debugger\dbg_decoder.h" />
