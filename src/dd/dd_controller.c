@@ -32,11 +32,9 @@
 
 
 void connect_dd(struct dd_controller* dd,
-                struct r4300_core* r4300,
-                struct ri_controller* ri)
+                struct r4300_core* r4300)
 {
 	dd->r4300 = r4300;
-	dd->ri = ri;
 }
 
 void init_dd(struct dd_controller* dd)

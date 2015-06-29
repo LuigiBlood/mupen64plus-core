@@ -1341,6 +1341,7 @@ int init_memory(void)
     init_ri(&g_ri);
     init_si(&g_si);
     init_vi(&g_vi);
+	init_dd(&g_dd);
 
     DebugMessage(M64MSG_VERBOSE, "Memory initialized");
     return 0;

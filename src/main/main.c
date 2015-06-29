@@ -846,6 +846,7 @@ static void connect_all(
         struct ri_controller* ri,
         struct si_controller* si,
         struct vi_controller* vi,
+		struct dd_controller* dd,
         uint32_t* dram,
         size_t dram_size,
         uint8_t* rom,
@@ -858,6 +859,7 @@ static void connect_all(
     connect_ri(ri, dram, dram_size);
     connect_si(si, r4300, ri);
     connect_vi(vi, r4300);
+	connect_dd(dd, r4300);
 }
 
 /*********************************************************************************************************
