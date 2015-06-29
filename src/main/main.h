@@ -36,6 +36,7 @@ struct ri_controller;
 struct rsp_core;
 struct si_controller;
 struct vi_controller;
+struct dd_controller;
 
 enum { RDRAM_MAX_SIZE = 0x800000 };
 

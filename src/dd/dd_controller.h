@@ -52,15 +52,21 @@ enum dd_registers
 
 struct dd_controller
 {
-    uint32_t regs[ASIC_REGS_COUNT];  
+    uint32_t regs[ASIC_REGS_COUNT];
+    uint32_t c2_buf[0x400/4];
+    uint32_t sec_buf[0x100/4];
+    uint32_t mseq_buf[0x40/4];
     
 	struct r4300_core* r4300;
-    struct ri_controller* ri;
 };
 
 static uint32_t dd_reg(uint32_t address)
 {
-    return (address & 0xffff) >> 2;
+    uint32_t temp = address & 0xffff;
+    if (temp >= 0x0500 && temp < 0x054c)
+        temp -= 0x0500;
+
+    return temp >> 2;
 }
 
 void connect_dd(struct dd_controller* dd,
@@ -70,5 +76,7 @@ void init_dd(struct dd_controller* dd);
 
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value);
 int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask);
+
+void dd_end_of_dma_event(struct dd_controller* dd);
 
 #endif

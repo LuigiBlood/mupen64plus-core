@@ -33,20 +33,31 @@
 void connect_dd(struct dd_controller* dd,
                 struct r4300_core* r4300)
 {
-	dd->r4300 = r4300;
+    dd->r4300 = r4300;
 }
 
 void init_dd(struct dd_controller* dd)
 {
-	memset(dd->regs, 0, ASIC_REGS_COUNT*sizeof(uint32_t));
+    memset(dd->regs, 0, ASIC_REGS_COUNT*sizeof(uint32_t));
+    memset(dd->c2_buf, 0, 0x400);
+    memset(dd->sec_buf, 0, 0x100);
+    memset(dd->mseq_buf, 0, 0x40);
 }
 
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
 {
-	//F-Zero X hack, unchanged
-	*value = (address == 0xa5000508)
-		? 0xffffffff
-		: 0x00000000;
+    struct dd_controller* dd = (struct dd_controller*)opaque;
+    uint32_t reg = dd_reg(address);
+
+    *value = 0x00000000;
+
+    switch (reg)
+    {
+        case ASIC_CMD_STATUS:
+            //F-Zero X hack
+            *value = 0xffffffff;
+            break;
+    }
 
 	return 0;
 }
@@ -54,4 +65,9 @@ int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
 int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 {
 	return 0;
+}
+
+void dd_end_of_dma_event(struct dd_controller* dd)
+{
+    //Insert clear CART INT here or something
 }

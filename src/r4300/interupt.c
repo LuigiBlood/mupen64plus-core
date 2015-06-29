@@ -47,6 +47,7 @@
 #include "rsp/rsp_core.h"
 #include "si/si_controller.h"
 #include "vi/vi_controller.h"
+#include "dd/dd_controller.h"
 
 int interupt_unsafe_state = 0;
 
@@ -576,6 +577,11 @@ void gen_interupt(void)
 
         case NMI_INT:
             nmi_int_handler();
+            break;
+
+        case CART_INT:
+            remove_interupt_event();
+            dd_end_of_dma_event(&g_dd);
             break;
 
         default:
