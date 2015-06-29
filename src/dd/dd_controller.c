@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   Mupen64plus - pi_controller.c                                         *
+*   Mupen64plus - dd_controller.c                                         *
 *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
 *   Copyright (C) 2014 Bobby Smiles                                       *
 *                                                                         *
@@ -28,7 +28,6 @@
 #include "main/main.h"
 #include "memory/memory.h"
 #include "r4300/r4300_core.h"
-#include "ri/ri_controller.h"
 
 
 void connect_dd(struct dd_controller* dd,

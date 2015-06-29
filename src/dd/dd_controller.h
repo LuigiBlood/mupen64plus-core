@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*   Mupen64plus - si_controller.h                                         *
+*   Mupen64plus - dd_controller.h                                         *
 *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
 *   Copyright (C) 2014 Bobby Smiles                                       *
 *                                                                         *
@@ -23,7 +23,6 @@
 #define DD_CONTROLLER_H
 
 struct r4300_core;
-struct ri_controller;
 
 #include <stdint.h>
 
