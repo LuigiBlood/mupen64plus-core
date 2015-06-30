@@ -23,6 +23,7 @@
 #define DD_CONTROLLER_H
 
 struct r4300_core;
+struct tm* timeinfo;
 
 #include <stdint.h>
 
@@ -77,6 +78,6 @@ void init_dd(struct dd_controller* dd);
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value);
 int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask);
 
-void dd_end_of_dma_event(struct dd_controller* dd);
+int dd_end_of_dma_event(struct dd_controller* dd);
 
 #endif

@@ -22,13 +22,22 @@
 #include "dd_controller.h"
 
 #include <string.h>
+#include <time.h>
 
 #include "api/callbacks.h"
+#include "api/config.h"
 #include "api/m64p_types.h"
 #include "main/main.h"
 #include "memory/memory.h"
 #include "r4300/r4300_core.h"
+#include "si/pif.h"
+#include "si/si_controller.h"
 
+static unsigned char byte2bcd(int n)
+{
+    n %= 100;
+    return ((n / 10) << 4) | (n % 10);
+}
 
 void connect_dd(struct dd_controller* dd,
                 struct r4300_core* r4300)
@@ -54,20 +63,88 @@ int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
     switch (reg)
     {
         case ASIC_CMD_STATUS:
-            //F-Zero X hack
-            *value = 0xffffffff;
+            *value = (!ConfigGetParamBool(g_CoreConfig, "64DD")) ? 0xffffffff : dd->regs[ASIC_CMD_STATUS];
             break;
+
+        default:
+            if (reg < ASIC_REGS_COUNT)
+                *value = dd->regs[reg];
     }
 
-	return 0;
+    return 0;
 }
 
 int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 {
-	return 0;
+    struct dd_controller* dd = (struct dd_controller*)opaque;
+    uint32_t reg = dd_reg(address);
+
+    value &= 0xffff0000;
+
+    switch (reg)
+    {
+        case ASIC_DATA:
+            dd->regs[ASIC_DATA] = value;
+            break;
+
+        case ASIC_BM_STATUS_CTL:
+            if (value == 0x01000000)
+            {
+                dd->regs[ASIC_CMD_STATUS] &= ~0x02000000;
+            }
+            break;
+
+        case ASIC_CMD_STATUS:
+            //ASIC Commands
+            timeinfo = af_rtc_get_time(&g_si.pif.af_rtc);
+            uint8_t year, month, hour, day, min, sec;
+
+            switch (value >> 16)
+            {
+                case 0x12:
+                    //Get Year/Month
+
+                    //Put time in DATA as BCD
+                    year = (uint8_t)byte2bcd(timeinfo->tm_year);
+                    month = (uint8_t)byte2bcd(timeinfo->tm_mon);
+
+                    dd->regs[ASIC_DATA] = (year << 24) | (month << 16);
+                    break;
+
+                case 0x13:
+                    //Get Day/Hour
+
+                    //Put time in DATA as BCD
+                    hour = (uint8_t)byte2bcd(timeinfo->tm_hour);
+                    day = (uint8_t)byte2bcd(timeinfo->tm_mday);
+
+                    dd->regs[ASIC_DATA] = (day << 24) | (hour << 16);
+                    break;
+                case 0x14:
+                    //Get Min/Sec
+
+                    //Put time in DATA as BCD
+                    min = (uint8_t)byte2bcd(timeinfo->tm_min);
+                    sec = (uint8_t)byte2bcd(timeinfo->tm_sec);
+
+                    dd->regs[ASIC_DATA] = (min << 24) | (sec << 16);
+                    break;
+            }
+
+            dd->regs[ASIC_CMD_STATUS] |= 0x02000000;
+            update_count();
+            add_interupt_event(CART_INT, 100);
+            break;
+    }
+
+    return 0;
 }
 
-void dd_end_of_dma_event(struct dd_controller* dd)
+int dd_end_of_dma_event(struct dd_controller* dd)
 {
     //Insert clear CART INT here or something
+    if (!(dd->regs[ASIC_CMD_STATUS] & 0x02000000))
+        return 1;
+
+    return 0;
 }
