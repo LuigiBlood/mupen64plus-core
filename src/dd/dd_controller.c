@@ -106,7 +106,7 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 
                     //Put time in DATA as BCD
                     year = (uint8_t)byte2bcd(timeinfo->tm_year);
-                    month = (uint8_t)byte2bcd(timeinfo->tm_mon);
+                    month = (uint8_t)byte2bcd((timeinfo->tm_mon + 1));
 
                     dd->regs[ASIC_DATA] = (year << 24) | (month << 16);
                     break;
