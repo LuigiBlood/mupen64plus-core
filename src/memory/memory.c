@@ -999,6 +999,32 @@ static void write_ddd(void)
 	writed(write_dd_regs, &g_dd, address, cpu_dword);
 }
 
+
+static void read_ddipl(void)
+{
+    readw(read_dd_ipl, &g_dd, address, rdword);
+}
+
+static void read_ddiplb(void)
+{
+    readb(read_dd_ipl, &g_dd, address, rdword);
+}
+
+static void read_ddiplh(void)
+{
+    readh(read_dd_ipl, &g_dd, address, rdword);
+}
+
+static void read_ddipld(void)
+{
+    readd(read_dd_ipl, &g_dd, address, rdword);
+}
+
+static void write_ddipl(void)
+{
+    writew(write_dd_ipl, &g_dd, address, cpu_word);
+}
+
 #ifdef DBG
 static int memtype[0x10000];
 static void (*saved_readmemb[0x10000])(void);
@@ -1290,10 +1316,22 @@ int init_memory(void)
     /* map DD registers */
     map_region(0x8500, M64P_MEM_DD, RW(dd));
     map_region(0xa500, M64P_MEM_DD, RW(dd));
-    for(i = 0x501; i < 0x800; ++i)
+    for(i = 0x501; i < 0x600; ++i)
     {
         map_region(0x8000+i, M64P_MEM_NOTHING, RW(nothing));
         map_region(0xa000+i, M64P_MEM_NOTHING, RW(nothing));
+    }
+
+	/* map DD IPL ROM */
+    for (i = 0x600; i < 0x640; ++i)
+    {
+        map_region(0x8000 + i, M64P_MEM_DD, R(ddipl), W(nothing));
+        map_region(0xa000 + i, M64P_MEM_DD, R(ddipl), W(nothing));
+    }
+    for (i = 0x640; i < 0x800; ++i)
+    {
+        map_region(0x8000 + i, M64P_MEM_NOTHING, RW(nothing));
+        map_region(0xa000 + i, M64P_MEM_NOTHING, RW(nothing));
     }
 
     /* map flashram/sram */

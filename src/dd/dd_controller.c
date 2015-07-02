@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 *   Mupen64plus - dd_controller.c                                         *
 *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
-*   Copyright (C) 2014 Bobby Smiles                                       *
+*   Copyright (C) 2015 LuigiBlood                                         *
 *                                                                         *
 *   This program is free software; you can redistribute it and/or modify  *
 *   it under the terms of the GNU General Public License as published by  *
@@ -40,9 +40,13 @@ static unsigned char byte2bcd(int n)
 }
 
 void connect_dd(struct dd_controller* dd,
-                struct r4300_core* r4300)
+                struct r4300_core* r4300,
+                uint8_t *ddrom,
+                size_t ddrom_size)
 {
     dd->r4300 = r4300;
+    dd->iplrom = ddrom;
+    dd->iplrom_size = ddrom_size;
 }
 
 void init_dd(struct dd_controller* dd)
@@ -65,7 +69,9 @@ int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
         case ASIC_CMD_STATUS:
             *value = (!ConfigGetParamBool(g_CoreConfig, "64DD")) ? 0xffffffff : dd->regs[ASIC_CMD_STATUS];
             break;
-
+        case ASIC_ID_REG:
+            *value = (dd->iplrom == NULL || dd->iplrom_size == 0) ? 0x00030000 : 0x00040000;
+            break;
         default:
             if (reg < ASIC_REGS_COUNT)
                 *value = dd->regs[reg];
@@ -80,6 +86,9 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
     uint32_t reg = dd_reg(address);
 
     value &= 0xffff0000;
+
+    if (!ConfigGetParamBool(g_CoreConfig, "64DD"))
+        return 0;
 
     switch (reg)
     {
@@ -137,6 +146,24 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
             break;
     }
 
+    return 0;
+}
+
+int read_dd_ipl(void* opaque, uint32_t address, uint32_t* value)
+{
+    struct dd_controller* dd = (struct dd_controller*)opaque;
+    uint32_t offset = address & (dd->iplrom_size & ~0x3);
+
+    if (dd->iplrom == NULL || dd->iplrom_size == 0)
+        return 0;
+
+    *value = *(uint32_t*)dd->iplrom + offset;
+
+    return 0;
+}
+
+int write_dd_ipl(void* opaque, uint32_t address, uint32_t* value)
+{
     return 0;
 }
 
