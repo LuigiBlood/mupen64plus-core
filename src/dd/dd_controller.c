@@ -25,7 +25,7 @@
 #include <time.h>
 
 #include "api/callbacks.h"
-#include "api/config.h"
+#include "api/m64p_config.h"
 #include "api/m64p_types.h"
 #include "main/main.h"
 #include "memory/memory.h"
@@ -162,7 +162,7 @@ int read_dd_ipl(void* opaque, uint32_t address, uint32_t* value)
     return 0;
 }
 
-int write_dd_ipl(void* opaque, uint32_t address, uint32_t* value)
+int write_dd_ipl(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 {
     return 0;
 }

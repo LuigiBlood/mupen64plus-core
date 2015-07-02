@@ -75,7 +75,9 @@ static uint32_t dd_reg(uint32_t address)
 }
 
 void connect_dd(struct dd_controller* dd,
-                struct r4300_core* r4300);
+                struct r4300_core* r4300,
+                uint8_t *ddrom,
+                size_t ddrom_size);
 
 void init_dd(struct dd_controller* dd);
 
