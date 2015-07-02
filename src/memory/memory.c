@@ -1322,7 +1322,7 @@ int init_memory(void)
         map_region(0xa000+i, M64P_MEM_NOTHING, RW(nothing));
     }
 
-	/* map DD IPL ROM */
+    /* map DD IPL ROM */
     for (i = 0x600; i < 0x640; ++i)
     {
         map_region(0x8000 + i, M64P_MEM_DD, R(ddipl), W(nothing));
