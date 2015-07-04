@@ -57,10 +57,6 @@ struct dd_controller
     uint32_t c2_buf[0x400/4];
     uint32_t sec_buf[0x100/4];
     uint32_t mseq_buf[0x40/4];
-
-    //uint32_t* iplrom[0x400000/4];
-    uint8_t* iplrom;
-    size_t iplrom_size;
     
 	struct r4300_core* r4300;
 };
@@ -75,17 +71,12 @@ static uint32_t dd_reg(uint32_t address)
 }
 
 void connect_dd(struct dd_controller* dd,
-                struct r4300_core* r4300,
-                uint8_t *ddrom,
-                size_t ddrom_size);
+                struct r4300_core* r4300);
 
 void init_dd(struct dd_controller* dd);
 
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value);
 int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask);
-
-int read_dd_ipl(void* opaque, uint32_t address, uint32_t* value);
-int write_dd_ipl(void* opaque, uint32_t address, uint32_t value, uint32_t mask);
 
 int dd_end_of_dma_event(struct dd_controller* dd);
 

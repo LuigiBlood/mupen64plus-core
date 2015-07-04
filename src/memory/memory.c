@@ -35,6 +35,7 @@
 #include "si/si_controller.h"
 #include "vi/vi_controller.h"
 #include "dd/dd_controller.h"
+#include "dd/dd_rom.h"
 
 #ifdef DBG
 #include <string.h>
@@ -1002,27 +1003,27 @@ static void write_ddd(void)
 
 static void read_ddipl(void)
 {
-    readw(read_dd_ipl, &g_dd, address, rdword);
+    readw(read_dd_ipl, &g_pi, address, rdword);
 }
 
 static void read_ddiplb(void)
 {
-    readb(read_dd_ipl, &g_dd, address, rdword);
+    readb(read_dd_ipl, &g_pi, address, rdword);
 }
 
 static void read_ddiplh(void)
 {
-    readh(read_dd_ipl, &g_dd, address, rdword);
+    readh(read_dd_ipl, &g_pi, address, rdword);
 }
 
 static void read_ddipld(void)
 {
-    readd(read_dd_ipl, &g_dd, address, rdword);
+    readd(read_dd_ipl, &g_pi, address, rdword);
 }
 
 static void write_ddipl(void)
 {
-    writew(write_dd_ipl, &g_dd, address, cpu_word);
+    writew(write_dd_ipl, &g_pi, address, cpu_word);
 }
 
 #ifdef DBG

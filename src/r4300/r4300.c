@@ -23,9 +23,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define M64P_CORE_PROTOTYPES 1
 #include "ai/ai_controller.h"
 #include "api/callbacks.h"
 #include "api/debugger.h"
+#include "api/m64p_config.h"
 #include "api/m64p_types.h"
 #include "cached_interp.h"
 #include "cp0_private.h"
@@ -174,13 +176,14 @@ void r4300_reset_soft(void)
     unsigned int s7 = 0;                    /* ??? */
     unsigned int tv_type = get_tv_type();   /* 0:PAL, 1:NTSC, 2:MPAL */
     uint32_t bsd_dom1_config;
-    if (ConfigGetParamInt(g_CoreConfig, "BootDevice") == 0)
-        bsd_dom1_config = *(uint32_t*)g_rom;
-    else
+
+    if ((ConfigGetParamInt(g_CoreConfig, "BootDevice") != 0) && (g_ddrom != NULL) && (g_ddrom_size != 0))
     {
         bsd_dom1_config = *(uint32_t*)g_ddrom;
         rom_type = 1;
     }
+    else
+        bsd_dom1_config = *(uint32_t*)g_rom;
 
     g_cp0_regs[CP0_STATUS_REG] = 0x34000000;
     g_cp0_regs[CP0_CONFIG_REG] = 0x0006e463;
@@ -203,10 +206,10 @@ void r4300_reset_soft(void)
 
     g_r4300.mi.regs[MI_INTR_REG] &= ~(MI_INTR_PI | MI_INTR_VI | MI_INTR_AI | MI_INTR_SP);
 
-    if (ConfigGetParamInt(g_CoreConfig, "BootDevice") == 0)
-        memcpy((unsigned char*)g_sp.mem+0x40, g_rom+0x40, 0xfc0);
-    else
+    if ((ConfigGetParamInt(g_CoreConfig, "BootDevice") != 0) && (g_ddrom != NULL) && (g_ddrom_size != 0))
         memcpy((unsigned char*)g_sp.mem+0x40, g_ddrom+0x40, 0xfc0);
+    else
+        memcpy((unsigned char*)g_sp.mem+0x40, g_rom+0x40, 0xfc0);
 
     reg[19] = rom_type;     /* s3 */
     reg[20] = tv_type;      /* s4 */
@@ -214,8 +217,8 @@ void r4300_reset_soft(void)
     reg[22] = g_si.pif.cic.seed;/* s6 */
     reg[23] = s7;           /* s7 */
 
-    if (ConfigGetParamInt(g_CoreConfig, "BootDevice") != 0)
-        reg[22] = 0xDD;
+    if ((ConfigGetParamInt(g_CoreConfig, "BootDevice") != 0) && (g_ddrom != NULL) && (g_ddrom_size != 0))
+        reg[22] = 0xdd;
 
     /* required by CIC x105 */
     g_sp.mem[0x1000/4] = 0x3c0dbfc0;

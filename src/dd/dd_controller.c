@@ -20,11 +20,12 @@
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "dd_controller.h"
+#include "dd_rom.h"
 
 #include <string.h>
 #include <time.h>
 
-#include "api/callbacks.h"
+#define M64P_CORE_PROTOTYPES 1
 #include "api/m64p_config.h"
 #include "api/m64p_types.h"
 #include "main/main.h"
@@ -40,13 +41,9 @@ static unsigned char byte2bcd(int n)
 }
 
 void connect_dd(struct dd_controller* dd,
-                struct r4300_core* r4300,
-                uint8_t *ddrom,
-                size_t ddrom_size)
+                struct r4300_core* r4300)
 {
     dd->r4300 = r4300;
-    dd->iplrom = ddrom;
-    dd->iplrom_size = ddrom_size;
 }
 
 void init_dd(struct dd_controller* dd)
@@ -55,6 +52,8 @@ void init_dd(struct dd_controller* dd)
     memset(dd->c2_buf, 0, 0x400);
     memset(dd->sec_buf, 0, 0x100);
     memset(dd->mseq_buf, 0, 0x40);
+
+    dd->regs[ASIC_CMD_STATUS] = 0x00400000;	//RESET state at boot
 }
 
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
@@ -67,10 +66,11 @@ int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
     switch (reg)
     {
         case ASIC_CMD_STATUS:
-            *value = (!ConfigGetParamBool(g_CoreConfig, "64DD")) ? 0xffffffff : dd->regs[ASIC_CMD_STATUS];
+            *value = (ConfigGetParamBool(g_CoreConfig, "64DD") == 1) ? dd->regs[ASIC_CMD_STATUS] : 0xffffffff;
             break;
         case ASIC_ID_REG:
-            *value = (dd->iplrom == NULL || dd->iplrom_size == 0) ? 0x00030000 : 0x00040000;
+            //*value = (pi->dd_rom->rom == NULL || pi->dd_rom->rom_size == 0) ? 0x00030000 : 0x00040000;
+            *value = 0x00030000;
             break;
         default:
             if (reg < ASIC_REGS_COUNT)
@@ -110,6 +110,11 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 
             switch (value >> 16)
             {
+                case 0x09:
+                    //CLEAR RESET FLAG
+                    dd->regs[ASIC_CMD_STATUS] &= ~0x00400000;
+                    break;
+
                 case 0x12:
                     //Get Year/Month
 
@@ -146,24 +151,6 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
             break;
     }
 
-    return 0;
-}
-
-int read_dd_ipl(void* opaque, uint32_t address, uint32_t* value)
-{
-    struct dd_controller* dd = (struct dd_controller*)opaque;
-    uint32_t offset = address & (dd->iplrom_size & ~0x3);
-
-    if (dd->iplrom == NULL || dd->iplrom_size == 0)
-        return 0;
-
-    *value = *(uint32_t*)dd->iplrom + offset;
-
-    return 0;
-}
-
-int write_dd_ipl(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
-{
     return 0;
 }
 

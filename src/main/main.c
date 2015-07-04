@@ -859,11 +859,11 @@ static void connect_all(
     connect_rdp(dp, r4300, sp, ri);
     connect_rsp(sp, r4300, dp, ri);
     connect_ai(ai, r4300, ri, vi);
-    connect_pi(pi, r4300, ri, rom, rom_size);
+    connect_pi(pi, r4300, ri, rom, rom_size, ddrom, ddrom_size);
     connect_ri(ri, dram, dram_size);
     connect_si(si, r4300, ri);
     connect_vi(vi, r4300);
-	connect_dd(dd, r4300, ddrom, ddrom_size);
+    connect_dd(dd, r4300);
 }
 
 /*********************************************************************************************************
@@ -902,7 +902,7 @@ m64p_error main_run(void)
 
     if (g_DDMemHasBeenBSwapped == 0)
     {
-        swap_buffer(g_ddrom, 4, g_ddrom_size / 4);
+        swap_buffer(g_ddrom, 4, g_ddrom_size/4);
         g_DDMemHasBeenBSwapped = 1;
     }
 
