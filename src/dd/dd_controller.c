@@ -52,8 +52,6 @@ void init_dd(struct dd_controller* dd)
     memset(dd->c2_buf, 0, 0x400);
     memset(dd->sec_buf, 0, 0x100);
     memset(dd->mseq_buf, 0, 0x40);
-
-    dd->regs[ASIC_CMD_STATUS] = 0x00400000;	//RESET state at boot
 }
 
 int read_dd_regs(void* opaque, uint32_t address, uint32_t* value)
@@ -110,6 +108,11 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
 
             switch (value >> 16)
             {
+                case 0x08:
+                    //CLEAR DISK CHANGE FLAG
+                    dd->regs[ASIC_CMD_STATUS] &= ~0x00010000;
+                    break;
+
                 case 0x09:
                     //CLEAR RESET FLAG
                     dd->regs[ASIC_CMD_STATUS] &= ~0x00400000;
@@ -148,6 +151,10 @@ int write_dd_regs(void* opaque, uint32_t address, uint32_t value, uint32_t mask)
             dd->regs[ASIC_CMD_STATUS] |= 0x02000000;
             update_count();
             add_interupt_event(CART_INT, 100);
+            break;
+
+        case ASIC_HARD_RESET:
+            dd->regs[ASIC_CMD_STATUS] |= 0x00400000;
             break;
     }
 
