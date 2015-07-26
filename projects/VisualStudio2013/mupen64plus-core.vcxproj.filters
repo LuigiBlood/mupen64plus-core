@@ -411,6 +411,9 @@
     <ClCompile Include="..\..\src\dd\dd_rom.c">
       <Filter>dd</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\dd\dd_disk.c">
+      <Filter>dd</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ai\ai_controller.h">
@@ -738,6 +741,9 @@
       <Filter>dd</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\dd\dd_rom.h">
+      <Filter>dd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dd\dd_disk.h">
       <Filter>dd</Filter>
     </ClInclude>
   </ItemGroup>
