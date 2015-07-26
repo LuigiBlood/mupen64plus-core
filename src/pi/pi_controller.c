@@ -27,10 +27,12 @@
 
 #include "api/callbacks.h"
 #include "api/m64p_types.h"
+#include "main/main.h"
 #include "memory/memory.h"
 #include "r4300/r4300_core.h"
 #include "ri/rdram_detection_hack.h"
 #include "ri/ri_controller.h"
+#include "dd/dd_controller.h"
 
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
@@ -51,7 +53,7 @@ static void dma_pi_read(struct pi_controller* pi)
     }
     else
     {
-        DebugMessage(M64MSG_WARNING, "Unknown dma read in dma_pi_read()");
+        DebugMessage(M64MSG_WARNING, "Unknown dma read at 0x%08X in dma_pi_read()", pi->regs[PI_CART_ADDR_REG]);
     }
 
     pi->regs[PI_STATUS_REG] |= 1;
@@ -81,8 +83,57 @@ static void dma_pi_write(struct pi_controller* pi)
                 dma_read_flashram(pi);
             }
         }
-        else if (pi->regs[PI_CART_ADDR_REG] >= 0x06000000 && pi->regs[PI_CART_ADDR_REG] < 0x08000000)
+        else if (pi->regs[PI_CART_ADDR_REG] >= 0x05000000 && pi->regs[PI_CART_ADDR_REG] < 0x06000000)
         {
+            //64DD REG/BUFFER
+            longueur = (pi->regs[PI_WR_LEN_REG] & 0xFFFFFF) + 1;
+            i = (pi->regs[PI_CART_ADDR_REG] - 0x05000000) & 0x1FFFFFF;
+
+            if (pi->regs[PI_CART_ADDR_REG] == 0x05000400)
+            {
+                //SECTOR BUFFER
+                i -= 0x400;
+                longueur = (i + longueur) > 0x100 ? (0x100 - i) : longueur;
+                rom_address = (pi->regs[PI_CART_ADDR_REG] - 0x05000400) & 0x3fffff;
+                rom = (uint8_t*)g_dd.sec_buf;
+                //g_dd.regs[ASIC_CMD_STATUS] &= ~0x14000000;
+                g_dd.regs[ASIC_CMD_STATUS] &= ~0x10000000;
+            }
+            else if (pi->regs[PI_CART_ADDR_REG] == 0x05000000)
+            {
+                //C2 BUFFER
+                rom_address = (pi->regs[PI_CART_ADDR_REG] - 0x05000000) & 0x3fffff;
+                longueur = (i + longueur) > 0x400 ? (0x400 - i) : longueur;
+                rom = (uint8_t*)g_dd.c2_buf;
+                //g_dd.regs[ASIC_CMD_STATUS] &= ~0x44000000;
+                g_dd.regs[ASIC_CMD_STATUS] &= ~0x40000000;
+            }
+            else
+            {
+                pi->regs[PI_STATUS_REG] |= 3;
+                update_count();
+                add_interupt_event(PI_INT, longueur / 8);
+
+                return;
+            }
+
+            longueur = (pi->regs[PI_DRAM_ADDR_REG] + longueur) > 0x7FFFFF ?
+                (0x7FFFFF - pi->regs[PI_DRAM_ADDR_REG]) : longueur;
+
+            dram_address = pi->regs[PI_DRAM_ADDR_REG];
+            dram = (uint8_t*)pi->ri->rdram.dram;
+
+			for (i = 0; i < longueur; ++i)
+                dram[(dram_address + i) ^ S8] = rom[(rom_address + i) ^ S8];
+
+            invalidate_r4300_cached_code(0x80000000 + dram_address, longueur);
+            invalidate_r4300_cached_code(0xa0000000 + dram_address, longueur);
+
+            pi->regs[PI_STATUS_REG] |= 3;
+            update_count();
+            add_interupt_event(PI_INT, longueur / 8);
+
+            //dd_update_bm(&g_dd);
         }
         else
         {
